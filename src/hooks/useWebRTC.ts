@@ -341,7 +341,7 @@ export default function useWebRTC(meetingId: string, userName: string) {
       // Replace with your actual signaling server URL
       // For local development: 'http://localhost:3001'
       // For production: 'https://your-signaling-server.com'
-      const SIGNALING_SERVER = 'http://localhost:3001';
+      const SIGNALING_SERVER = 'http://3.25.54.8:3001';
       
       const socket = io(SIGNALING_SERVER);
       socketRef.current = socket;
