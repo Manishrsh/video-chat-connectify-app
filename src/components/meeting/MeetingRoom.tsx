@@ -82,6 +82,8 @@ export default function MeetingRoom() {
       isMuted: peer?.isMuted || false,
       isVideoOff: peer?.isVideoOff || false
     }));
+    console.log('Updated participants:', participantList);
+    
     setParticipants(participantList);
   }, [peers]);
 

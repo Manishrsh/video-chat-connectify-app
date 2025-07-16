@@ -29,7 +29,7 @@ const VideoStream = forwardRef<HTMLVideoElement, VideoStreamProps>(
         className
       )}>
         <video
-          ref={ref || videoRef}
+          ref={videoRef}
           className={cn(
             "w-full h-full object-cover",
             isLocal && "scale-x-[-1]", // Mirror local video
