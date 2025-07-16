@@ -14,34 +14,34 @@ const queryClient = new QueryClient();
 
 // You need to set your Clerk Publishable Key here
 // Get it from: https://go.clerk.com/lovable
-const PUBLISHABLE_KEY = "YOUR_CLERK_PUBLISHABLE_KEY_HERE";
+const PUBLISHABLE_KEY = "pk_test_c3RpcnJlZC1zaWxrd29ybS05Mi5jbGVyay5hY2NvdW50cy5kZXYk";
 
 const App = () => {
-  if (!PUBLISHABLE_KEY || PUBLISHABLE_KEY === "YOUR_CLERK_PUBLISHABLE_KEY_HERE") {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold mb-4 text-destructive">
-            Clerk Configuration Required
-          </h1>
-          <p className="text-muted-foreground mb-4">
-            Please set your Clerk Publishable Key in src/App.tsx to enable authentication.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Get your key from:{" "}
-            <a 
-              href="https://go.clerk.com/lovable" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              https://go.clerk.com/lovable
-            </a>
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // if (!PUBLISHABLE_KEY || PUBLISHABLE_KEY === "pk_test_c3RpcnJlZC1zaWxrd29ybS05Mi5jbGVyay5hY2NvdW50cy5kZXYk") {
+  //   return (
+  //     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+  //       <div className="text-center max-w-md">
+  //         <h1 className="text-2xl font-bold mb-4 text-destructive">
+  //           Clerk Configuration Required
+  //         </h1>
+  //         <p className="text-muted-foreground mb-4">
+  //           Please set your Clerk Publishable Key in src/App.tsx to enable authentication.
+  //         </p>
+  //         <p className="text-sm text-muted-foreground">
+  //           Get your key from:{" "}
+  //           <a 
+  //             href="https://go.clerk.com/lovable" 
+  //             target="_blank" 
+  //             rel="noopener noreferrer"
+  //             className="text-primary hover:underline"
+  //           >
+  //             https://go.clerk.com/lovable
+  //           </a>
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
