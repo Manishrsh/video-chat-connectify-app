@@ -26,7 +26,7 @@ export default function useWebRTC(meetingId: string, userName: string) {
   const [peers, setPeers] = useState<Record<string, PeerData>>({});
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-
+  const [localUserId ,setLocalUserId] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const peersRef = useRef<Record<string, PeerConnection>>({});
@@ -349,8 +349,9 @@ export default function useWebRTC(meetingId: string, userName: string) {
       socket.on('connect', () => {
         console.log('Connected to signaling server');
         setIsConnected(true);
-        
+        setLocalUserId(socket.id);
         // Join the meeting room
+        
         socket.emit('join-room', { roomId: meetingId, userName });
       });
 
@@ -368,7 +369,9 @@ export default function useWebRTC(meetingId: string, userName: string) {
   }
 
   users.forEach(({ userId, userName }) => {
-    makeCall(userId, userName); // will now addTrack correctly
+    if (userId !== localUserId) {
+      makeCall(userId, userName); // Or whatever your logic is
+    }
   });
 });
 
