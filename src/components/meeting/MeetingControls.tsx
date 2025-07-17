@@ -27,6 +27,8 @@ type MeetingControlsProps = {
   onStartRecording: () => void;
   onStopRecording: () => void;
   onToggleChat: () => void;
+  hasUnread: boolean;
+
 };
 
 
@@ -43,6 +45,7 @@ export default function MeetingControls({
   onStartRecording,
   onStopRecording,
   onToggleChat,
+  hasUnread,
   participantCount = 1
 }: MeetingControlsProps) {
   return (
@@ -95,14 +98,19 @@ export default function MeetingControls({
           <div className="w-px h-8 bg-video-border mx-2" />
 
           {/* Chat */}
-          <Button
-            variant="video"
-            size="icon-lg"
-            onClick={onToggleChat}
-            className="rounded-full relative"
-          >
-            <MessageSquare className="h-6 w-6" />
-          </Button>
+         <Button
+  variant="video"
+  size="icon-lg"
+  onClick={onToggleChat}
+  className="rounded-full relative"
+>
+  <MessageSquare className="h-6 w-6" />
+  
+  {hasUnread && (
+    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full" />
+  )}
+</Button>
+
 
           {/* Participants */}
           {onToggleParticipants && (

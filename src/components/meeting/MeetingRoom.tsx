@@ -20,6 +20,12 @@ interface Participant {
   isVideoOff: boolean;
 }
 
+interface Message {
+  sender: string;
+  text: string;
+  timestamp: string;
+}
+
 export default function MeetingRoom() {
   const { meetingId } = useParams<{ meetingId: string }>();
   const { user } = useUser();
@@ -34,6 +40,7 @@ export default function MeetingRoom() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 const recordedChunksRef = useRef<Blob[]>([]);
 const [isRecording, setIsRecording] = useState(false);
+const isChatOpenRef = useRef(false);
 const [showChat, setShowChat] = useState(false);
 
 
@@ -44,14 +51,20 @@ const [showChat, setShowChat] = useState(false);
   
   // WebRTC hook
   const { 
-    peers, 
-    initializeMedia, 
-    toggleMute, 
-    toggleVideo, 
-    startScreenShare, 
-    stopScreenShare,
-    leaveMeeting 
-  } = useWebRTC(meetingId || '', user?.fullName || 'Anonymous');
+  peers, 
+  initializeMedia, 
+  toggleMute, 
+  toggleVideo, 
+  startScreenShare, 
+  stopScreenShare,
+  leaveMeeting,
+  hasUnread,
+  setHasUnread,
+  messages,
+  setMessages,
+  socketRef,
+} = useWebRTC(meetingId || '', user?.fullName || 'Anonymous');
+
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -81,7 +94,17 @@ const [showChat, setShowChat] = useState(false);
     };
   }, []);
 
-  
+  const handleToggleChat = () => {
+  const nextState = !showChat;
+  setShowChat(nextState);
+  isChatOpenRef.current = nextState;
+
+  if (nextState) {
+    setHasUnread(false); // Clear unread
+  }
+};
+
+
 
   // Update participants from WebRTC peers
   useEffect(() => {
@@ -308,7 +331,8 @@ const handleStopRecording = () => {
   isRecording={isRecording}
   onStartRecording={handleStartRecording}
   onStopRecording={handleStopRecording}
-  onToggleChat={() => setShowChat(!showChat)}
+  onToggleChat={handleToggleChat}
+  hasUnread={hasUnread}
 />
 
 
@@ -334,8 +358,17 @@ const handleStopRecording = () => {
     meetingId={meetingId || ''}
     username={user?.fullName || 'You'}
     onClose={() => setShowChat(false)}
+    messages={messages}
+    setMessages={setMessages}
+    participants={[
+      { id: 'local', name: user?.fullName || 'You' },
+      ...participants.map(p => ({ id: p.id, name: p.name }))
+
+    ]} // 👈 Now passed
+    socketRef={socketRef} // 👈 Pass socket reference
   />
 )}
+
 
     </div>
   );
