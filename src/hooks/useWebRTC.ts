@@ -369,6 +369,8 @@ export default function useWebRTC(meetingId: string, userName: string) {
   }
 
   users.forEach(({ userId, userName }) => {
+    console.log('Existing user:', userId, localUserId);
+    
     if (userId !== localUserId) {
       makeCall(userId, userName); // Or whatever your logic is
     }
