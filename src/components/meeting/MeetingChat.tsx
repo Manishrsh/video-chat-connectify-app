@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { Button } from "@/components/ui/button";
 
-const socket = io("http://localhost:3001");
+const socket = io("https://signal.scaletex.tech");
 
 interface Message {
   sender: string;
