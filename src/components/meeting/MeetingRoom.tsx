@@ -83,17 +83,19 @@ const [showChat, setShowChat] = useState(false);
 
   // Update participants from WebRTC peers
   useEffect(() => {
-    const participantList: Participant[] = Object.entries(peers).map(([id, peer]) => ({
+  const participantList: Participant[] = Object.entries(peers)
+    .filter(([id]) => id !== 'local') // Adjust this if needed based on your local ID
+    .map(([id, peer]) => ({
       id,
       name: peer?.name || 'Participant',
       stream: peer?.stream,
       isMuted: peer?.isMuted || false,
       isVideoOff: peer?.isVideoOff || false
     }));
-    console.log('Updated participants:', participantList);
-    
-    setParticipants(participantList);
-  }, [peers]);
+
+  setParticipants(participantList);
+}, [peers]);
+
 
   const handleToggleMute = () => {
     const newMutedState = !isMuted;
