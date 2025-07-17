@@ -102,52 +102,63 @@ const [showChat, setShowChat] = useState(false);
   };
 
   const handleStartRecording = () => {
-  if (!localStream) return;
+  if (!localStream) {
+    toast({ title: "No local stream found", variant: "destructive" });
+    return;
+  }
 
   const allStreams = new MediaStream();
 
-  // Add local tracks
-  localStream.getTracks().forEach((track) =>
-    allStreams.addTrack(track)
-  );
+  // ✅ Add **audio + video** tracks from local stream
+  localStream.getAudioTracks().forEach(track => allStreams.addTrack(track));
+  localStream.getVideoTracks().forEach(track => allStreams.addTrack(track));
 
-  // Add remote tracks
-  participants.forEach((p) => {
-    p.stream?.getTracks().forEach((track) =>
-      allStreams.addTrack(track)
-    );
+  // ✅ Add **audio + video** tracks from each remote participant
+  participants.forEach(p => {
+    if (p.stream) {
+      p.stream.getAudioTracks().forEach(track => allStreams.addTrack(track));
+      p.stream.getVideoTracks().forEach(track => allStreams.addTrack(track));
+    }
   });
 
   recordedChunksRef.current = [];
 
-  const recorder = new MediaRecorder(allStreams, {
-    mimeType: "video/webm; codecs=vp8,opus",
-  });
-
-  recorder.ondataavailable = (event) => {
-    if (event.data.size > 0) {
-      recordedChunksRef.current.push(event.data);
-    }
-  };
-
-  recorder.onstop = () => {
-    const blob = new Blob(recordedChunksRef.current, {
-      type: "video/webm",
+  try {
+    const recorder = new MediaRecorder(allStreams, {
+      mimeType: "video/webm;codecs=vp8,opus"
     });
-    const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `connectify-recording-${meetingId}.webm`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+    recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        recordedChunksRef.current.push(event.data);
+      }
+    };
 
-  recorder.start();
-  mediaRecorderRef.current = recorder;
-  setIsRecording(true);
-  toast({ title: "Recording started" });
+    recorder.onstop = () => {
+      const blob = new Blob(recordedChunksRef.current, {
+        type: "video/webm"
+      });
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `connectify-recording-${meetingId}.webm`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+    };
+
+    recorder.start();
+    mediaRecorderRef.current = recorder;
+    setIsRecording(true);
+    toast({ title: "Recording started" });
+  } catch (error) {
+    console.error("Recording failed to start:", error);
+    toast({ title: "Failed to start recording", variant: "destructive" });
+  }
 };
+
 
 const handleStopRecording = () => {
   mediaRecorderRef.current?.stop();
