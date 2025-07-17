@@ -347,7 +347,7 @@ export default function useWebRTC(meetingId: string, userName: string) {
       socketRef.current = socket;
 
       socket.on('connect', () => {
-        console.log('Connected to signaling server');
+        console.log('Connected to signaling server' ,socket.id);
         setIsConnected(true);
         setLocalUserId(socket.id);
         // Join the meeting room
@@ -369,9 +369,9 @@ export default function useWebRTC(meetingId: string, userName: string) {
   }
 
   users.forEach(({ userId, userName }) => {
-    console.log('Existing user:', userId, localUserId);
     
-    if (userId !== localUserId) {
+    
+    if (userId !== socket.id) {
       makeCall(userId, userName); // Or whatever your logic is
     }
   });
