@@ -13,10 +13,16 @@ const server = http.createServer(app);
 // Enable CORS for all origins (in production, specify your frontend domain)
 const io = socketIo(server, {
   cors: {
-    origin: "*", // In production: "http://localhost:8080" or your domain
-    methods: ["GET", "POST"]
+    origin: [
+      "https://meet.scaletex.tech",      // ✅ your Vercel frontend
+      "https://video-chat-connectify-app-3anw.vercel.app", // ✅ Vercel preview (optional)
+      "http://localhost:5173"                              // ✅ local dev
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
+
 
 app.use(cors());
 app.use(express.json());

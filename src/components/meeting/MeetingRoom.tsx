@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, Users, Video } from "lucide-react";
 import useWebRTC from "@/hooks/useWebRTC";
+import MeetingChat from "./MeetingChat"; 
+
 
 interface Participant {
   id: string;
@@ -29,6 +31,12 @@ export default function MeetingRoom() {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+const recordedChunksRef = useRef<Blob[]>([]);
+const [isRecording, setIsRecording] = useState(false);
+const [showChat, setShowChat] = useState(false);
+
+
   
   // UI state
   const [showParticipants, setShowParticipants] = useState(false);
@@ -92,6 +100,61 @@ export default function MeetingRoom() {
     setIsMuted(newMutedState);
     toggleMute(newMutedState);
   };
+
+  const handleStartRecording = () => {
+  if (!localStream) return;
+
+  const allStreams = new MediaStream();
+
+  // Add local tracks
+  localStream.getTracks().forEach((track) =>
+    allStreams.addTrack(track)
+  );
+
+  // Add remote tracks
+  participants.forEach((p) => {
+    p.stream?.getTracks().forEach((track) =>
+      allStreams.addTrack(track)
+    );
+  });
+
+  recordedChunksRef.current = [];
+
+  const recorder = new MediaRecorder(allStreams, {
+    mimeType: "video/webm; codecs=vp8,opus",
+  });
+
+  recorder.ondataavailable = (event) => {
+    if (event.data.size > 0) {
+      recordedChunksRef.current.push(event.data);
+    }
+  };
+
+  recorder.onstop = () => {
+    const blob = new Blob(recordedChunksRef.current, {
+      type: "video/webm",
+    });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `connectify-recording-${meetingId}.webm`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  recorder.start();
+  mediaRecorderRef.current = recorder;
+  setIsRecording(true);
+  toast({ title: "Recording started" });
+};
+
+const handleStopRecording = () => {
+  mediaRecorderRef.current?.stop();
+  setIsRecording(false);
+  toast({ title: "Recording stopped" });
+};
+
 
   const handleToggleVideo = () => {
     const newVideoState = !isVideoOff;
@@ -216,16 +279,21 @@ export default function MeetingRoom() {
 
       {/* Meeting Controls */}
       <MeetingControls
-        isMuted={isMuted}
-        isVideoOff={isVideoOff}
-        isScreenSharing={isScreenSharing}
-        onToggleMute={handleToggleMute}
-        onToggleVideo={handleToggleVideo}
-        onToggleScreenShare={handleToggleScreenShare}
-        onLeaveMeeting={handleLeaveMeeting}
-        onToggleParticipants={() => setShowParticipants(!showParticipants)}
-        participantCount={totalParticipants}
-      />
+  isMuted={isMuted}
+  isVideoOff={isVideoOff}
+  isScreenSharing={isScreenSharing}
+  onToggleMute={handleToggleMute}
+  onToggleVideo={handleToggleVideo}
+  onToggleScreenShare={handleToggleScreenShare}
+  onLeaveMeeting={handleLeaveMeeting}
+  onToggleParticipants={() => setShowParticipants(!showParticipants)}
+  participantCount={totalParticipants}
+  isRecording={isRecording}
+  onStartRecording={handleStartRecording}
+  onStopRecording={handleStopRecording}
+  onToggleChat={() => setShowChat(!showChat)}
+/>
+
 
       {/* Participants Panel */}
       {showParticipants && (
@@ -243,6 +311,15 @@ export default function MeetingRoom() {
           onClose={() => setShowParticipants(false)}
         />
       )}
+
+      {showChat && (
+  <MeetingChat
+    meetingId={meetingId || ''}
+    username={user?.fullName || 'You'}
+    onClose={() => setShowChat(false)}
+  />
+)}
+
     </div>
   );
 }

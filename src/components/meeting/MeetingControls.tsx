@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface MeetingControlsProps {
+type MeetingControlsProps = {
   isMuted: boolean;
   isVideoOff: boolean;
   isScreenSharing: boolean;
@@ -21,10 +21,14 @@ interface MeetingControlsProps {
   onToggleVideo: () => void;
   onToggleScreenShare: () => void;
   onLeaveMeeting: () => void;
-  onToggleChat?: () => void;
-  onToggleParticipants?: () => void;
-  participantCount?: number;
-}
+  onToggleParticipants: () => void;
+  participantCount: number;
+  isRecording: boolean;
+  onStartRecording: () => void;
+  onStopRecording: () => void;
+  onToggleChat: () => void;
+};
+
 
 export default function MeetingControls({
   isMuted,
@@ -34,8 +38,11 @@ export default function MeetingControls({
   onToggleVideo,
   onToggleScreenShare,
   onLeaveMeeting,
-  onToggleChat,
   onToggleParticipants,
+  isRecording,
+  onStartRecording,
+  onStopRecording,
+  onToggleChat,
   participantCount = 1
 }: MeetingControlsProps) {
   return (
@@ -88,16 +95,14 @@ export default function MeetingControls({
           <div className="w-px h-8 bg-video-border mx-2" />
 
           {/* Chat */}
-          {onToggleChat && (
-            <Button
-              variant="video"
-              size="icon-lg"
-              onClick={onToggleChat}
-              className="rounded-full"
-            >
-              <MessageSquare className="h-6 w-6" />
-            </Button>
-          )}
+          <Button
+            variant="video"
+            size="icon-lg"
+            onClick={onToggleChat}
+            className="rounded-full relative"
+          >
+            <MessageSquare className="h-6 w-6" />
+          </Button>
 
           {/* Participants */}
           {onToggleParticipants && (
@@ -117,13 +122,14 @@ export default function MeetingControls({
           )}
 
           {/* Settings */}
-          <Button
-            variant="video"
-            size="icon-lg"
-            className="rounded-full"
-          >
-            <Settings className="h-6 w-6" />
-          </Button>
+         <Button
+  variant="video"
+  size="sm"
+  onClick={isRecording ? onStopRecording : onStartRecording}
+>
+  {isRecording ? "Stop Recording" : "Start Recording"}
+</Button>
+
 
           {/* Divider */}
           <div className="w-px h-8 bg-video-border mx-2" />

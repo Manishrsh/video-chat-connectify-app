@@ -341,7 +341,7 @@ export default function useWebRTC(meetingId: string, userName: string) {
       // Replace with your actual signaling server URL
       // For local development: 'http://localhost:3001'
       // For production: 'https://your-signaling-server.com'
-      const SIGNALING_SERVER = 'https://signal.scaletex.tech';
+      const SIGNALING_SERVER = 'http://localhost:3001';
       
       const socket = io(SIGNALING_SERVER);
       socketRef.current = socket;
@@ -377,6 +377,7 @@ export default function useWebRTC(meetingId: string, userName: string) {
       socket.on('user-joined', ({ userId, userName }: { userId: string; userName: string }) => {
         console.log('User joined:', userId, userName);
         // The new user will call us, so we just wait for their offer
+        
       });
 
       // Handle user left
