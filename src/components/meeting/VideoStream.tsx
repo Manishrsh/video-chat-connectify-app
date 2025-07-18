@@ -32,10 +32,12 @@ const VideoStream = forwardRef<HTMLVideoElement, VideoStreamProps>(
         <video
           ref={videoRef}
           className={cn(
-            "w-full h-full object-cover",
-            isLocal && "scale-x-[-1]", // Mirror local video
-            isVideoOff && "hidden"
-          )}
+  "w-full h-full",
+  stream?.getVideoTracks()[0]?.label.includes("screen") ? "object-contain" : "object-cover",
+  isLocal && "scale-x-[-1]",
+  isVideoOff && "hidden"
+)}
+
           autoPlay
           playsInline
           muted={isLocal} // Always mute local video to prevent feedback

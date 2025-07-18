@@ -241,7 +241,7 @@ export default function useWebRTC(meetingId: string, userName: string) {
     isRecognizing = false;
     if (event.error === "no-speech" || event.error === "aborted") {
       clearTimeout(restartTimeout);
-      restartTimeout = setTimeout(startRecognition, 1000);
+      restartTimeout = setTimeout(startRecognition, 200);
     }
   };
 
