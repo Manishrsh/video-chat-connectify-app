@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Copy, Users, Video } from "lucide-react";
 import useWebRTC from "@/hooks/useWebRTC";
 import MeetingChat from "./MeetingChat"; 
+import TranscriptionPanel from "./TranscriptionPanel";
 
 
 interface Participant {
@@ -364,17 +365,12 @@ const handleStopRecording = () => {
       )}
 
      {/* Live Subtitles Panel */}
-{showSubtitles && transcripts.length > 0 && (
-  <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-3xl bg-black/70 backdrop-blur-md rounded-2xl px-6 py-3 shadow-lg border border-white/10 text-white">
-    <div className="text-sm font-semibold text-center text-gray-300 mb-1">Live Subtitles</div>
-    <div className="max-h-40 overflow-y-auto space-y-1">
-      {transcripts.slice(-6).map((t, i) => (
-        <div key={i} className="text-sm text-white">
-          <span className="font-medium text-indigo-300">{t.sender}:</span> {t.text}
-        </div>
-      ))}
-    </div>
-  </div>
+{showSubtitles && (
+  <TranscriptionPanel
+    transcripts={transcripts}
+    onClose={() => setShowSubtitles(false)}
+  />
+
 )}
 
 
