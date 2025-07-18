@@ -197,15 +197,26 @@ recognition.onaudioend = () => console.log("Audio capturing ended");
     socketRef.current?.emit("newTranscript", { name: userName, text: transcript });
   };
 
- recognition.onerror = (event) => {
+ let shouldRestart = false;
+
+recognition.onerror = (event) => {
   console.error("Speech recognition error", event);
 
   if (event.error === "no-speech" || event.error === "aborted") {
-    console.log("Restarting recognition due to no speech...");
-    recognition.stop();
-    recognition.start(); // Restart
+    shouldRestart = true;
+    recognition.stop(); // This will trigger `onend`
   }
 };
+
+recognition.onend = () => {
+  console.log("Speech recognition ended");
+  if (shouldRestart) {
+    shouldRestart = false;
+    console.log("Restarting speech recognition...");
+    recognition.start();
+  }
+};
+
 
 
   recognition.start();
