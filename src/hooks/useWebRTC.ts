@@ -210,11 +210,11 @@ recognition.onerror = (event) => {
 
 recognition.onend = () => {
   console.log("Speech recognition ended");
-  if (shouldRestart) {
+ 
     shouldRestart = false;
     console.log("Restarting speech recognition...");
     recognition.start();
-  }
+  
 };
 
 
