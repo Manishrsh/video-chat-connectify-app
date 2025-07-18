@@ -44,6 +44,8 @@ const [isRecording, setIsRecording] = useState(false);
 const isChatOpenRef = useRef(false);
 const [showChat, setShowChat] = useState(false);
 const [showSubtitles, setShowSubtitles] = useState(true);
+const [isHandRaised, setIsHandRaised] = useState(false);
+
 
 
   
@@ -65,7 +67,9 @@ const [showSubtitles, setShowSubtitles] = useState(true);
   messages,
   setMessages,
   socketRef,
-  transcripts
+  transcripts, 
+  raisedHands ,
+  setRaisedHands
 } = useWebRTC(meetingId || '', user?.fullName || 'Anonymous');
 
 
@@ -111,6 +115,19 @@ const [showSubtitles, setShowSubtitles] = useState(true);
   }
 };
 
+
+
+const handleToggleHandRaise = () => {
+  const newStatus = !isHandRaised;
+  setIsHandRaised(newStatus);
+
+  socketRef.current?.emit("RAISE_HAND", {
+    roomId: meetingId,
+    userId: socketRef.current.id,
+    name: user?.fullName || "Anonymous",
+    raised: newStatus,
+  });
+};
 
 
   // Update participants from WebRTC peers
@@ -316,6 +333,7 @@ const handleStopRecording = () => {
                   isMuted={participant.isMuted}
                   isVideoOff={participant.isVideoOff}
                   username={participant.name}
+                  showRaisedHand={raisedHands[participant.id]}
                   className="aspect-video"
                 />
               ))}
@@ -343,6 +361,8 @@ const handleStopRecording = () => {
   // 👇 Add these
   subtitlesVisible={showSubtitles}
   onToggleSubtitles={handleToggleSubtitles}
+  onToggleHandRaise={handleToggleHandRaise}
+  isHandRaised={isHandRaised}
 />
 
 

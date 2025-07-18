@@ -9,10 +9,11 @@ interface VideoStreamProps {
   isVideoOff?: boolean;
   username?: string;
   className?: string;
+  showRaisedHand?: boolean; 
 }
 
 const VideoStream = forwardRef<HTMLVideoElement, VideoStreamProps>(
-  ({ stream, isLocal = false, isMuted = false, isVideoOff = false, username, className }, ref) => {
+  ({ stream, isLocal = false, isMuted = false, isVideoOff = false, username, className ,showRaisedHand  }, ref) => {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
@@ -68,6 +69,13 @@ const VideoStream = forwardRef<HTMLVideoElement, VideoStreamProps>(
             You
           </div>
         )}
+        {/* Raise Hand Badge */}
+{showRaisedHand && (
+  <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded shadow">
+    ✋ Raised Hand
+  </div>
+)}
+
       </div>
     );
   }

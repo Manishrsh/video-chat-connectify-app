@@ -41,6 +41,8 @@ export default function useWebRTC(meetingId: string, userName: string) {
   const peersRef = useRef<Record<string, PeerConnection>>({});
   const isChatOpenRef = useRef(false); // ✅ track chat panel state
   const [transcripts, setTranscripts] = useState<{ sender: string; text: string }[]>([]);
+  const [raisedHands, setRaisedHands] = useState<Record<string, boolean>>({});
+
 
 
   // === Media Initialization ===
@@ -272,6 +274,25 @@ export default function useWebRTC(meetingId: string, userName: string) {
     }
   }, []);
 
+
+  useEffect(() => {
+  const socket = socketRef.current;
+
+  const handleRaiseHand = ({ userId, raised }) => {
+    setRaisedHands(prev => ({
+      ...prev,
+      [userId]: raised,
+    }));
+  };
+
+  socket?.on("RAISE_HAND", handleRaiseHand);
+
+  return () => {
+    socket?.off("RAISE_HAND", handleRaiseHand);
+  };
+}, []);
+
+
   const leaveMeeting = useCallback(() => {
     Object.values(peersRef.current).forEach(({ pc }) => pc.close());
     localStreamRef.current?.getTracks().forEach(track => track.stop());
@@ -384,6 +405,8 @@ export default function useWebRTC(meetingId: string, userName: string) {
     setHasUnread,
     isChatOpenRef, 
     socketRef,// ✅ expose to let UI toggle and reset unread
-    transcripts
+    transcripts,
+     raisedHands,
+  setRaisedHands,
   };
 }

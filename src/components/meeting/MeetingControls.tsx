@@ -9,7 +9,8 @@ import {
   MessageSquare,
   Users,
   Monitor,
-  Subtitles 
+  Subtitles ,
+  Hand ,
 } from "lucide-react"; // Subtitles icon
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,8 @@ type MeetingControlsProps = {
   // 👇 New props
   onToggleSubtitles: () => void;
   subtitlesVisible: boolean;
+  onToggleHandRaise: () => void;
+isHandRaised: boolean;
 };
 
 export default function MeetingControls({
@@ -50,7 +53,10 @@ export default function MeetingControls({
   hasUnread,
   onToggleSubtitles,
   subtitlesVisible,
+  onToggleHandRaise,
+  isHandRaised,
   participantCount = 1,
+
 }: MeetingControlsProps) {
   return (
     <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-screen-md px-2">
@@ -124,6 +130,16 @@ export default function MeetingControls({
           >
             <Subtitles  className="h-6 w-6" />
           </Button>
+
+{/* Raise Hand */}
+<Button
+  variant={isHandRaised ? "video-active" : "video"}
+  size="icon-lg"
+  onClick={onToggleHandRaise}
+  className="rounded-full"
+>
+  <Hand className="h-6 w-6" />
+</Button>
 
           {/* Recording */}
           <Button
