@@ -186,15 +186,27 @@ export default function useWebRTC(meetingId: string, userName: string) {
   recognition.interimResults = false;
   recognition.lang = "en-US"; // You can change this to "hi-IN" etc
 
+  recognition.onaudiostart = () => console.log("Audio capturing started");
+recognition.onsoundstart = () => console.log("Sound detected");
+recognition.onsoundend = () => console.log("Sound ended");
+recognition.onaudioend = () => console.log("Audio capturing ended");
+
   recognition.onresult = (event: any) => {
     const transcript = event.results[event.resultIndex][0].transcript.trim();
     console.log("Speaking:", transcript);
     socketRef.current?.emit("newTranscript", { name: userName, text: transcript });
   };
 
-  recognition.onerror = (e) => {
-    console.error("Speech recognition error:", e);
-  };
+ recognition.onerror = (event) => {
+  console.error("Speech recognition error", event);
+
+  if (event.error === "no-speech" || event.error === "aborted") {
+    console.log("Restarting recognition due to no speech...");
+    recognition.stop();
+    recognition.start(); // Restart
+  }
+};
+
 
   recognition.start();
 
