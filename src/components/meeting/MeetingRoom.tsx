@@ -42,6 +42,7 @@ const recordedChunksRef = useRef<Blob[]>([]);
 const [isRecording, setIsRecording] = useState(false);
 const isChatOpenRef = useRef(false);
 const [showChat, setShowChat] = useState(false);
+const [showSubtitles, setShowSubtitles] = useState(true);
 
 
   
@@ -94,6 +95,10 @@ const [showChat, setShowChat] = useState(false);
       }
     };
   }, []);
+
+  const handleToggleSubtitles = () => {
+  setShowSubtitles(prev => !prev);
+};
 
   const handleToggleChat = () => {
   const nextState = !showChat;
@@ -319,7 +324,7 @@ const handleStopRecording = () => {
       </div>
 
       {/* Meeting Controls */}
-      <MeetingControls
+     <MeetingControls
   isMuted={isMuted}
   isVideoOff={isVideoOff}
   isScreenSharing={isScreenSharing}
@@ -334,7 +339,11 @@ const handleStopRecording = () => {
   onStopRecording={handleStopRecording}
   onToggleChat={handleToggleChat}
   hasUnread={hasUnread}
+  // 👇 Add these
+  subtitlesVisible={showSubtitles}
+  onToggleSubtitles={handleToggleSubtitles}
 />
+
 
 
       {/* Participants Panel */}
@@ -355,18 +364,19 @@ const handleStopRecording = () => {
       )}
 
      {/* Live Subtitles Panel */}
-{transcripts.length > 0 && (
+{showSubtitles && transcripts.length > 0 && (
   <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-3xl bg-black/70 backdrop-blur-md rounded-2xl px-6 py-3 shadow-lg border border-white/10 text-white">
     <div className="text-sm font-semibold text-center text-gray-300 mb-1">Live Subtitles</div>
     <div className="max-h-40 overflow-y-auto space-y-1">
       {transcripts.slice(-6).map((t, i) => (
         <div key={i} className="text-sm text-white">
-          <span className="font-medium text-indigo-300">{t.name}:</span> {t.text}
+          <span className="font-medium text-indigo-300">{t.sender}:</span> {t.text}
         </div>
       ))}
     </div>
   </div>
 )}
+
 
 
       {showChat && (

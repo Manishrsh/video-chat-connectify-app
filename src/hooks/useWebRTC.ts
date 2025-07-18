@@ -40,7 +40,7 @@ export default function useWebRTC(meetingId: string, userName: string) {
   const localStreamRef = useRef<MediaStream | null>(null);
   const peersRef = useRef<Record<string, PeerConnection>>({});
   const isChatOpenRef = useRef(false); // ✅ track chat panel state
-  const [transcripts, setTranscripts] = useState<{ name: string; text: string }[]>([]);
+  const [transcripts, setTranscripts] = useState<{ sender: string; text: string }[]>([]);
 
 
   // === Media Initialization ===
@@ -357,9 +357,9 @@ export default function useWebRTC(meetingId: string, userName: string) {
       }
     });
 
-    socket.on("newTranscript", ({ name, text }) => {
-  console.log("Received new transcript:", name, text);
-  setTranscripts((prev) => [...prev, { name, text }]);
+    socket.on("newTranscript", ({ sender, text }) => {
+  console.log("Received new transcript:", sender, text);
+  setTranscripts((prev) => [...prev, { sender, text }]);
 });
 
 
