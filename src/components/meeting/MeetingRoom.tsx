@@ -290,72 +290,58 @@ const handleStopRecording = () => {
       </div>
 
       {/* Video Grid */}
-      
-        <div className="p-4 pb-24">
-  <div className="container mx-auto">
-    {focusedParticipant ? (
-      // Full screen single participant
-      <div className="flex flex-col items-center">
-        <div className="w-full max-w-5xl aspect-video mb-4">
-          <VideoStream
-            stream={focusedParticipant.stream}
-            isMuted={focusedParticipant.isMuted}
-            isVideoOff={focusedParticipant.isVideoOff}
-            username={focusedParticipant.name}
-            showRaisedHand={raisedHands[focusedParticipant.id]}
-            className="w-full h-full"
-          />
+      <div className="p-4 pb-24">
+        <div className="container mx-auto">
+          {participants.length === 0 ? (
+            // Solo view - large local video
+            <div className="flex justify-center">
+              <div className="w-full max-w-4xl aspect-video">
+                <VideoStream
+                  ref={localVideoRef}
+                  stream={localStream || undefined}
+                  isLocal={true}
+                  isMuted={isMuted}
+                  isVideoOff={isVideoOff}
+                  username={user?.fullName || 'You'}
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
+          ) : (
+            // Grid view for multiple participants
+            <div className={`grid gap-4 ${
+              participants.length === 1 
+                ? 'grid-cols-1 lg:grid-cols-2' 
+                : participants.length <= 4
+                ? 'grid-cols-1 md:grid-cols-2'
+                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            }`}>
+              {/* Local video */}
+              <VideoStream
+                ref={localVideoRef}
+                stream={localStream || undefined}
+                isLocal={true}
+                isMuted={isMuted}
+                isVideoOff={isVideoOff}
+                username={user?.fullName || 'You'}
+                className="aspect-video"
+              />
+              
+              {/* Remote participants */}
+              {participants.map((participant) => (
+                <VideoStream
+                  key={participant.id}
+                  stream={participant.stream}
+                  isMuted={participant.isMuted}
+                  isVideoOff={participant.isVideoOff}
+                  username={participant.name}
+                  showRaisedHand={raisedHands[participant.id]}
+                  className="aspect-video"
+                />
+              ))}
+            </div>
+          )}
         </div>
-        <Button variant="outline" onClick={() => setFocusedParticipant(null)}>
-          Exit Fullscreen View
-        </Button>
-      </div>
-    ) : (
-      // Grid view
-      <div className={`grid gap-4 ${
-        participants.length === 1 
-          ? 'grid-cols-1 lg:grid-cols-2' 
-          : participants.length <= 4
-          ? 'grid-cols-1 md:grid-cols-2'
-          : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-      }`}>
-        {/* Local video */}
-        <div onClick={() => setFocusedParticipant({
-          id: 'local',
-          name: user?.fullName || 'You',
-          stream: localStream || undefined,
-          isMuted,
-          isVideoOff
-        })}>
-          <VideoStream
-            ref={localVideoRef}
-            stream={localStream || undefined}
-            isLocal={true}
-            isMuted={isMuted}
-            isVideoOff={isVideoOff}
-            username={user?.fullName || 'You'}
-            className="aspect-video cursor-pointer hover:ring-2 hover:ring-primary"
-          />
-        </div>
-
-        {/* Remote videos */}
-        {participants.map((participant) => (
-          <div key={participant.id} onClick={() => setFocusedParticipant(participant)}>
-            <VideoStream
-              stream={participant.stream}
-              isMuted={participant.isMuted}
-              isVideoOff={participant.isVideoOff}
-              username={participant.name}
-              showRaisedHand={raisedHands[participant.id]}
-              className="aspect-video cursor-pointer hover:ring-2 hover:ring-primary"
-            />
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-
-
       </div>
 
       {/* Meeting Controls */}
