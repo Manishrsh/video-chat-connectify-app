@@ -13,22 +13,27 @@ interface TranscriptionPanelProps {
 
 export default function TranscriptionPanel({ transcripts, onClose }: TranscriptionPanelProps) {
   return (
-    <div className="fixed right-4 top-20 bottom-4 w-80 z-40 bg-muted text-muted-foreground rounded-xl shadow-lg border border-border overflow-hidden flex flex-col">
-      <CardHeader className="bg-muted px-4 py-3 border-b border-border flex justify-between items-center">
-        <CardTitle className="text-base">Live Transcription</CardTitle>
-        <button onClick={onClose} className="text-xs underline">Close</button>
-      </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
-        {transcripts.length === 0 ? (
-          <div className="text-sm text-center text-muted-foreground">Waiting for transcription...</div>
-        ) : (
-          transcripts.map((t, i) => (
-            <div key={i} className="text-sm">
-              <span className="font-semibold text-primary">{t.sender}</span>: {t.text}
-            </div>
-          ))
-        )}
-      </CardContent>
-    </div>
+   <div className="fixed top-0 right-0 h-full w-80 bg-video-controls/95 backdrop-blur-lg border-l border-video-border z-50 flex flex-col">
+  {/* Header */}
+  <div className="p-3 font-bold border-b border-video-border text-white flex justify-between items-center">
+    Live Transcription
+    <button onClick={onClose} className="hover:text-red-400">✖</button>
+  </div>
+
+  {/* Transcription Messages */}
+  <div className="flex-1 overflow-y-auto p-3 space-y-2 text-white">
+    {transcripts.length === 0 ? (
+      <div className="text-sm text-center text-gray-400">Waiting for transcription...</div>
+    ) : (
+      transcripts.map((t, i) => (
+        <div key={i} className="mb-2">
+          <p className="font-semibold">{t.sender}</p>
+          <p>{t.text}</p>
+        </div>
+      ))
+    )}
+  </div>
+</div>
+
   );
 }
