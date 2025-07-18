@@ -120,7 +120,8 @@ const [isHandRaised, setIsHandRaised] = useState(false);
 const handleToggleHandRaise = () => {
   const newStatus = !isHandRaised;
   setIsHandRaised(newStatus);
-
+  console.log("🙌 User", socketRef.current?.id, newStatus ? "raised their hand" : "lowered their hand");
+  
   socketRef.current?.emit("RAISE_HAND", {
     roomId: meetingId,
     userId: socketRef.current.id,

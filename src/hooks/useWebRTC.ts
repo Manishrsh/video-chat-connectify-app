@@ -275,22 +275,20 @@ export default function useWebRTC(meetingId: string, userName: string) {
   }, []);
 
 
-  useEffect(() => {
-  const socket = socketRef.current;
+
 
   const handleRaiseHand = ({ userId, raised }) => {
+    console.log("🙌 User", userId, raised ? "raised their hand" : "lowered their hand");
     setRaisedHands(prev => ({
       ...prev,
       [userId]: raised,
     }));
   };
 
-  socket?.on("RAISE_HAND", handleRaiseHand);
+  socketRef.current?.on("RAISE_HAND", handleRaiseHand);
 
-  return () => {
-    socket?.off("RAISE_HAND", handleRaiseHand);
-  };
-}, []);
+  
+
 
 
   const leaveMeeting = useCallback(() => {
