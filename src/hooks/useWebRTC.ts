@@ -194,7 +194,7 @@ recognition.onaudioend = () => console.log("Audio capturing ended");
   recognition.onresult = (event: any) => {
     const transcript = event.results[event.resultIndex][0].transcript.trim();
     console.log("Speaking:", transcript);
-    socketRef.current?.emit("newTranscript", { name: userName, text: transcript });
+    socketRef.current?.emit("newTranscript", { name: userName, text: transcript , roomId: meetingId });
   };
 
  let shouldRestart = false;
@@ -329,6 +329,7 @@ recognition.onend = () => {
     });
 
     socket.on("newTranscript", ({ name, text }) => {
+  console.log("Received new transcript:", name, text);
   setTranscripts((prev) => [...prev, { name, text }]);
 });
 
