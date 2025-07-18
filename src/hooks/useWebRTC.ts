@@ -175,7 +175,6 @@ export default function useWebRTC(meetingId: string, userName: string) {
   if (!localStream) return;
 
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
   if (!SpeechRecognition) {
     console.warn("SpeechRecognition not supported in this browser.");
     return;
@@ -184,45 +183,75 @@ export default function useWebRTC(meetingId: string, userName: string) {
   const recognition = new SpeechRecognition();
   recognition.continuous = true;
   recognition.interimResults = false;
-  recognition.lang = "en-US"; // You can change this to "hi-IN" etc
+  recognition.lang = "en-US";
 
-  recognition.onaudiostart = () => console.log("Audio capturing started");
-recognition.onsoundstart = () => console.log("Sound detected");
-recognition.onsoundend = () => console.log("Sound ended");
-recognition.onaudioend = () => console.log("Audio capturing ended");
+  let isRecognizing = false;
+  let restartTimeout: NodeJS.Timeout;
+
+  const startRecognition = () => {
+    if (!isRecognizing) {
+      try {
+        recognition.start();
+        isRecognizing = true;
+        console.log("🎙️ Speech recognition started");
+      } catch (e) {
+        console.warn("Recognition start failed:", e);
+      }
+    }
+  };
+
+  const stopRecognition = () => {
+    if (isRecognizing) {
+      recognition.stop();
+      isRecognizing = false;
+      console.log("🛑 Speech recognition stopped");
+    }
+  };
+
+  recognition.onstart = () => {
+    isRecognizing = true;
+  };
+
+  recognition.onend = () => {
+    isRecognizing = false;
+    console.log("🔁 Recognition ended. Restarting...");
+    clearTimeout(restartTimeout);
+    restartTimeout = setTimeout(startRecognition, 1000);
+  };
+
+  recognition.onaudiostart = () => console.log("🎧 Audio started");
+  recognition.onsoundstart = () => console.log("🔊 Sound detected");
+  recognition.onsoundend = () => console.log("🔇 Sound ended");
+  recognition.onaudioend = () => console.log("📴 Audio ended");
 
   recognition.onresult = (event: any) => {
     const transcript = event.results[event.resultIndex][0].transcript.trim();
-    console.log("Speaking:", transcript);
-    socketRef.current?.emit("newTranscript", { name: userName, text: transcript , roomId: meetingId });
+    console.log("📡 Speaking:", transcript);
+    socketRef.current?.emit("newTranscript", {
+      name: userName,
+      text: transcript,
+      roomId: meetingId,
+    });
   };
 
- let shouldRestart = false;
+  recognition.onerror = (event) => {
+    console.error("❌ Speech recognition error:", event.error);
+    isRecognizing = false;
+    if (event.error === "no-speech" || event.error === "aborted") {
+      clearTimeout(restartTimeout);
+      restartTimeout = setTimeout(startRecognition, 1000);
+    }
+  };
 
-recognition.onerror = (event) => {
-  console.error("Speech recognition error", event);
+  // Start once initially
+  startRecognition();
 
-  if (event.error === "no-speech" || event.error === "aborted") {
-    shouldRestart = true;
-    recognition.stop(); // This will trigger `onend`
-  }
-};
-
-recognition.onend = () => {
-  console.log("Speech recognition ended");
- 
-    shouldRestart = false;
-    console.log("Restarting speech recognition...");
-    recognition.start();
-  
-};
-
-
-
-  recognition.start();
-
-  return () => recognition.stop();
+  return () => {
+    stopRecognition();
+    clearTimeout(restartTimeout);
+  };
 }, [localStream]);
+
 
 
   const stopScreenShare = useCallback(async () => {
