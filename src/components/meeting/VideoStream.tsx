@@ -26,7 +26,7 @@ const VideoStream = forwardRef<HTMLVideoElement, VideoStreamProps>(
 
     return (
       <div className={cn(
-        "relative rounded-lg overflow-hidden bg-video-bg border border-video-border",
+        "relative rounded-lg  bg-video-bg border border-video-border",
         className
       )}>
         <video
