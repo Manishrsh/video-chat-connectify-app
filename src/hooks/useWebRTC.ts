@@ -40,6 +40,8 @@ export default function useWebRTC(meetingId: string, userName: string) {
   const localStreamRef = useRef<MediaStream | null>(null);
   const peersRef = useRef<Record<string, PeerConnection>>({});
   const isChatOpenRef = useRef(false); // ✅ track chat panel state
+  const [transcripts, setTranscripts] = useState<{ name: string; text: string }[]>([]);
+
 
   // === Media Initialization ===
   const initializeMedia = useCallback(async (): Promise<MediaStream> => {
@@ -169,6 +171,37 @@ export default function useWebRTC(meetingId: string, userName: string) {
     videoTrack.onended = () => stopScreenShare();
   }, []);
 
+  useEffect(() => {
+  if (!localStream) return;
+
+  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    console.warn("SpeechRecognition not supported in this browser.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = false;
+  recognition.lang = "en-US"; // You can change this to "hi-IN" etc
+
+  recognition.onresult = (event: any) => {
+    const transcript = event.results[event.resultIndex][0].transcript.trim();
+    console.log("Speaking:", transcript);
+    socketRef.current?.emit("newTranscript", { name: userName, text: transcript });
+  };
+
+  recognition.onerror = (e) => {
+    console.error("Speech recognition error:", e);
+  };
+
+  recognition.start();
+
+  return () => recognition.stop();
+}, [localStream]);
+
+
   const stopScreenShare = useCallback(async () => {
     const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
     const cameraTrack = cameraStream.getVideoTracks()[0];
@@ -272,6 +305,11 @@ export default function useWebRTC(meetingId: string, userName: string) {
       }
     });
 
+    socket.on("newTranscript", ({ name, text }) => {
+  setTranscripts((prev) => [...prev, { name, text }]);
+});
+
+
     return () => {
       socket.disconnect();
     };
@@ -292,6 +330,7 @@ export default function useWebRTC(meetingId: string, userName: string) {
     hasUnread,
     setHasUnread,
     isChatOpenRef, 
-    socketRef// ✅ expose to let UI toggle and reset unread
+    socketRef,// ✅ expose to let UI toggle and reset unread
+    transcripts
   };
 }
